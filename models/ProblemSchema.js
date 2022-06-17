@@ -1,31 +1,36 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
 const ProblemSchema = new mongoose.Schema({
-    email: {
-        type: String,
-        required: true,
-    },
-    password: {
-        type: String,
-        required: true,
-    },
-    firstName: {
-        type: String,
-        required: true,
-    },
-    lastName: {
-        type: String,
-        required: true,
-    },
-    allProblems: {
-        type: Array
-    },
-    allSolutions: {
-        type: Array
-    }
+  id: {
+    type: String,
+    required: true,
+  },
+  title: {
+    type: String,
+    required: true,
+  },
+  shortDescription: {
+    type: String,
+    required: true,
+  },
+  fullDescription: {
+    type: String,
+    required: true,
+  },
+  errorMessages: {
+    type: String,
+  },
+  codeUsed: {
+    type: String,
+  },
+  allSolutions: {
+    type: Array
+  },
+  upVotes: {
+    type: Number,
+  },
 });
 // Looks for the plural of user
-const User = mongoose.model("User", UserSchema)
+const Problem = mongoose.model("Problem", ProblemSchema);
 
-module.exports = User;
-
+module.exports = Problem;

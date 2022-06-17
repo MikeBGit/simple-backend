@@ -1,31 +1,21 @@
 const mongoose = require('mongoose');
 
 const SolutionSchema = new mongoose.Schema({
-    email: {
+    id: {
         type: String,
         required: true,
     },
-    password: {
+    title: {
         type: String,
         required: true,
     },
-    firstName: {
+    solutionText: {
         type: String,
         required: true,
-    },
-    lastName: {
-        type: String,
-        required: true,
-    },
-    allProblems: {
-        type: Array
-    },
-    allSolutions: {
-        type: Array
     }
 });
 // Looks for the plural of user
-const User = mongoose.model("User", UserSchema)
+const Solution = mongoose.model("Solution", SolutionSchema)
 
-module.exports = User;
+module.exports = Solution;
 
