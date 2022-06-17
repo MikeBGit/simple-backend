@@ -10,13 +10,11 @@ const saltRounds = 10;
 
 const mongoose = require("mongoose");
 const userModel = require("./models/UserSchema");
-// const problemModel = require("./models/ProblemSchema");
-// const solutionModel = require("./models/SolutionSchema");
+const problemModel = require("./models/ProblemSchema");
+const solutionModel = require("./models/SolutionSchema");
 
 const app = express();
-
 const port = process.env.PORT || 3001; // Heroku determines the port dynamically
-
 app.use(cors());
 
 mongoose.connect(
@@ -180,7 +178,53 @@ app.post("/users/login", async (request, response) => {
 });
 
 // =======================================================================================================
-// Problems
+
+//  Add Problem To Users
+app.post("/problem", async (request, response) => {
+  const authorEmail = request.body.authorEmail;
+  const problem = {
+    id: uuid(),
+    title: request.body.title,
+    shortDescription: request.body.shortDescription,
+    fullDescription: request.body.fullDescription,
+    errorMessages: request.body.errorMessages,
+    codeUsed: request.body.codeUsed,
+    allSolutions: [],
+  };
+
+  try {
+    await userModel.updateOne(
+      { email: authorEmail },
+      { $addToSet: { allProblems: [problem.id] } }
+    );
+    const result = await problemModel.create(problem);
+
+    response.send(result);
+  } catch (err) {
+    response.send(err);
+  }
+});
+//  Add Solution To Problem
+app.post("/solution", async (request, response) => {
+  const problemID = request.body.problemID;
+  const solution = {
+    id: uuid(),
+    title: request.body.title,
+    solutionText: request.body.solutionText,
+  };
+
+  try {
+    await problemModel.updateOne(
+      { id: problemID },
+      { $addToSet: { allSolutions: [solution.id] } }
+    );
+    const result = await solutionModel.create(solution);
+
+    response.send(result);
+  } catch (err) {
+    response.send(err);
+  }
+});
 
 app.listen(port, "0.0.0.0", () =>
   console.log(`Hello world app listening on port ${port}!`)
