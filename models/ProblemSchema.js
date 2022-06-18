@@ -3,22 +3,16 @@ const mongoose = require("mongoose");
 const ProblemSchema = new mongoose.Schema({
   id: {
     type: String,
-<<<<<<< HEAD
     unique: true,
   },
   authorID: {
     type: String,
-=======
->>>>>>> 67e5579073337c3566f0b38614ecff9b05e3ac01
     required: true,
   },
   title: {
     type: String,
     required: true,
-<<<<<<< HEAD
     unique: true,
-=======
->>>>>>> 67e5579073337c3566f0b38614ecff9b05e3ac01
   },
   shortDescription: {
     type: String,
@@ -30,7 +24,6 @@ const ProblemSchema = new mongoose.Schema({
   },
   errorMessages: {
     type: String,
-<<<<<<< HEAD
     required: true,
   },
   codeUsed: {
@@ -39,17 +32,6 @@ const ProblemSchema = new mongoose.Schema({
   },
   allSolutionIDS: {
     type: Array,
-=======
-  },
-  codeUsed: {
-    type: String,
-  },
-  allSolutions: {
-    type: Array
-  },
-  upVotes: {
-    type: Number,
->>>>>>> 67e5579073337c3566f0b38614ecff9b05e3ac01
   },
 });
 // Looks for the plural of user
