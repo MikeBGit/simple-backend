@@ -40,8 +40,6 @@ app.use(express.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-
-
 // =======================================================================================================
 // REGISTER & LOGIN
 
@@ -102,7 +100,10 @@ app.post("/users/login", async (request, response) => {
         const isSame = await bcrypt.compare(password, user.password);
         if (isSame) {
           console.log("Successful login");
-          response.send({ success: true });
+          response.send({
+            success: true,
+            id: user.id,
+          });
           return;
         }
       }
@@ -302,17 +303,6 @@ app.delete("/solution/:id", async (req, res) => {
 app.listen(port, "0.0.0.0", () =>
   console.log(`Hello world app listening on port ${port}!`)
 );
-
-
-
-
-
-
-
-
-
-
-
 
 /* An API post request using body /users */
 // app.post("/users", async (req, res) => {
