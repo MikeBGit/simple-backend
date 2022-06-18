@@ -22,7 +22,11 @@ const UserSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+<<<<<<< HEAD
   allProblemIDS: {
+=======
+  allProblems: {
+>>>>>>> 67e5579073337c3566f0b38614ecff9b05e3ac01
     type: Array,
   },
 });
