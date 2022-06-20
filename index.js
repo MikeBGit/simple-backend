@@ -63,6 +63,7 @@ app.post("/users/register", async (request, response) => {
       } else {
         hashedPassword = await bcrypt.hash(password, saltRounds);
         console.log("Registering email " + email);
+        console.log("TEST", uuid());
         const userToSave = {
           id: uuid(),
           email: email,
@@ -72,14 +73,14 @@ app.post("/users/register", async (request, response) => {
           lastName: lastName,
         };
         await userModel.create(userToSave);
-        response.send({ success: true });
+        response.send({ success: true, userID: userToSave.id });
         return;
       }
     }
   } catch (error) {
+    response.send({ success: false });
     console.log(error.message);
   }
-  response.send({ success: false });
 });
 
 // =======================================================================================================
@@ -125,6 +126,10 @@ app.get("/problems", async (req, res) => {
   const problem = await problemModel.find();
   res.send(problem);
 });
+app.get("/solutions", async (req, res) => {
+  const solution = await solutionModel.find();
+  res.send(solution);
+});
 
 // =======================================================================================================
 // CREATES
@@ -150,9 +155,9 @@ app.post("/problem", async (request, response) => {
       { $addToSet: { allProblemIDS: problem.id } }
     );
     // const result = await problemModel.create(problem);
-    response.send(result);
+    response.send({ result: result, success: true });
   } catch (err) {
-    response.send(err.message);
+    response.send({ message: err.message, success: false });
   }
 });
 
@@ -174,9 +179,9 @@ app.post("/solution", async (request, response) => {
       { id: problemID },
       { $addToSet: { allSolutionIDS: solution.id } }
     );
-    response.send(result);
+    response.send({ result: result, success: "true" });
   } catch (err) {
-    response.send(err.message);
+    response.send({ message: err.message, success: "false" });
   }
 });
 
@@ -299,6 +304,11 @@ app.delete("/solution/:id", async (req, res) => {
     response.send(err.message);
   }
 });
+
+// =======================================================================================================
+//SEED
+
+// =======================================================================================================
 
 app.listen(port, "0.0.0.0", () =>
   console.log(`Hello world app listening on port ${port}!`)
