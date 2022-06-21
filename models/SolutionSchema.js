@@ -19,6 +19,9 @@ const SolutionSchema = new mongoose.Schema({
     required: true,
   },
   solutionText: String,
+  upVotes: { type: Number, default: 0 },
+  enabled: { type: Boolean, default: true },
+  teacherSolved: Boolean,
 });
 // Looks for the plural of user
 const Solution = mongoose.model("Solution", SolutionSchema);

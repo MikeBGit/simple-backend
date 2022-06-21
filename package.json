@@ -18,5 +18,8 @@
     "mongoose": "^6.3.5",
     "uuid": "^8.3.2",
     "validator": "^13.7.0"
+  },
+  "devDependencies": {
+    "@faker-js/faker": "^7.3.0"
   }
 }

@@ -339,6 +339,18 @@ app.delete("/solution/:id", async (req, res) => {
 // =======================================================================================================
 //SEED
 
+app.delete("/delete/all", async (req, res) => {
+  try {
+    const usersDeleted = await userModel.deleteMany({});
+    const problemsDeleted = await problemModel.deleteMany({});
+    const solutionsDeleted = await solutionModel.deleteMany({});
+
+    res.send(usersDeleted, problemsDeleted, solutionsDeleted);
+  } catch (err) {
+    response.send(err.message);
+  }
+});
+
 // =======================================================================================================
 
 app.listen(port, "0.0.0.0", () =>
