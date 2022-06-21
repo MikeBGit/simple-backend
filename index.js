@@ -104,6 +104,8 @@ app.post("/users/login", async (request, response) => {
           response.send({
             success: true,
             id: user.id,
+            firstName: user.firstName,
+            lastName: user.lastName,
           });
           return;
         }
@@ -208,10 +210,12 @@ app.post("/problem", async (request, response) => {
 app.post("/solution", async (request, response) => {
   const problemID = request.body.problemID;
   const authorID = request.body.authorID;
+  const authorName = request.body.authorName;
   const solution = {
     id: uuid(),
     problemID: problemID,
     authorID: authorID,
+    authorName: authorName,
     title: request.body.title,
     solutionText: request.body.solutionText,
   };

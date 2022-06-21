@@ -10,6 +10,7 @@ const SolutionSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  authorName: String,
   problemID: {
     type: String,
     required: true,
