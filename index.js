@@ -142,6 +142,15 @@ app.get("/problem/:id", async (req, res) => {
     response.send(err.message);
   }
 });
+app.get("/user/:id", async (req, res) => {
+  const id = req.params.id;
+  try {
+    const result = await userModel.findOne({ id: id });
+    res.send(result);
+  } catch (err) {
+    response.send(err.message);
+  }
+});
 
 app.get("/solutions/:id", async (req, res) => {
   const id = req.params.id;
@@ -168,10 +177,12 @@ app.get("/solution/:id", async (req, res) => {
 //  User Create Problem
 app.post("/problem", async (request, response) => {
   const authorID = request.body.authorID;
+  const authorName = request.body.authorName;
   const problem = {
     id: uuid(),
     authorID: authorID,
     title: request.body.title,
+    authorName: authorName,
     shortDescription: request.body.shortDescription,
     fullDescription: request.body.fullDescription,
     errorMessages: request.body.errorMessages,
