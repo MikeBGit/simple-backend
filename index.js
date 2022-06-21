@@ -130,6 +130,37 @@ app.get("/solutions", async (req, res) => {
   const solution = await solutionModel.find();
   res.send(solution);
 });
+// =======================================================================================================
+// GET ONES
+// =======================================================================================================
+app.get("/problem/:id", async (req, res) => {
+  const id = req.params.id;
+  try {
+    const result = await problemModel.findOne({ id: id });
+    res.send(result);
+  } catch (err) {
+    response.send(err.message);
+  }
+});
+
+app.get("/solutions/:id", async (req, res) => {
+  const id = req.params.id;
+  try {
+    const allSolutions = await solutionModel.find({ problemID: id });
+    res.send(allSolutions);
+  } catch (err) {
+    response.send(err.message);
+  }
+});
+app.get("/solution/:id", async (req, res) => {
+  const id = req.params.id;
+  try {
+    const solution = await solutionModel.findOne({ problemID: id });
+    res.send(solution);
+  } catch (err) {
+    response.send(err.message);
+  }
+});
 
 // =======================================================================================================
 // CREATES
