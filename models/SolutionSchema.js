@@ -20,7 +20,7 @@ const SolutionSchema = new mongoose.Schema({
     required: true,
   },
   solutionText: String,
-  upVotes: { type: Number, default: 0 },
+  upVotes: Array,
   enabled: { type: Boolean, default: true },
   teacherSolved: Boolean,
 });

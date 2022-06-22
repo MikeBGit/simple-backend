@@ -34,7 +34,7 @@ const ProblemSchema = new mongoose.Schema({
   allSolutionIDS: {
     type: Array,
   },
-  upVotes: { type: Number, default: 0 },
+  upVotes: Array,
   enabled: { type: Boolean, default: true },
 });
 // Looks for the plural of user
