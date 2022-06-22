@@ -288,6 +288,28 @@ app.patch("/problem/edit", async (req, res) => {
     response.send(err.message);
   }
 });
+// Update Solution
+app.patch("/solution/edit", async (req, res) => {
+  const id = req.body.id;
+
+  const title = req.body.title;
+  const solutionText = req.body.solutionText;
+
+  try {
+    const results = await solutionModel.updateOne(
+      { id: id },
+      {
+        title: title,
+        solutionText: solutionText,
+      }
+    );
+    console.log("matched: " + results.matchedCount);
+    console.log("modified: " + results.modifiedCount);
+    res.send({ success: "true" });
+  } catch (err) {
+    response.send(err.message);
+  }
+});
 
 // =======================================================================================================
 // LIKES
