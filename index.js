@@ -13,6 +13,7 @@ const userModel = require("./models/UserSchema");
 const problemModel = require("./models/ProblemSchema");
 const solutionModel = require("./models/SolutionSchema");
 const { response } = require("express");
+const { findById, findOne } = require("./models/UserSchema");
 
 const app = express();
 const port = process.env.PORT || 3001; // Heroku determines the port dynamically
@@ -235,15 +236,16 @@ app.post("/solution", async (request, response) => {
 // UPDATES
 // =======================================================================================================
 // Update User
-app.patch("/user/:id", async (req, res) => {
-  const id = req.params.id;
-  const email = req.body.email;
+app.patch("/user/:email", async (req, res) => {
+  const paramsEmail = req.params.email;
+
+  const email = paramsEmail;
   const firstName = req.body.firstName;
   const lastName = req.body.lastName;
 
   try {
     const results = await userModel.updateOne(
-      { id: id },
+      { email: email },
       {
         email: email,
         firstName: firstName,
@@ -252,16 +254,16 @@ app.patch("/user/:id", async (req, res) => {
     );
     console.log("matched: " + results.matchedCount);
     console.log("modified: " + results.modifiedCount);
-    res.send(results);
+    res.send({ success: "true" });
   } catch (err) {
     response.send(err.message);
   }
 });
-
-// =======================================================================================================
 // Update Problem
-app.patch("/problem/:id", async (req, res) => {
-  const id = req.params.id;
+
+app.patch("/problem/edit", async (req, res) => {
+  const id = req.body.id;
+
   const title = req.body.title;
   const shortDescription = req.body.shortDescription;
   const fullDescription = req.body.fullDescription;
@@ -281,38 +283,81 @@ app.patch("/problem/:id", async (req, res) => {
     );
     console.log("matched: " + results.matchedCount);
     console.log("modified: " + results.modifiedCount);
-    res.send(results);
+    res.send({ success: "true" });
   } catch (err) {
     response.send(err.message);
   }
 });
 
 // =======================================================================================================
-// Update Solution
-app.patch("/solution/:id", async (req, res) => {
-  const id = req.params.id;
-  const title = req.body.title;
-  const solutionText = req.body.solutionText;
+// LIKES
+// =======================================================================================================
+//  Create Solution to Problem
+app.post("/like/problem", async (request, response) => {
+  const id = request.body.id;
+  const userID = request.body.userID;
 
-  try {
-    const results = await solutionModel.updateOne(
-      { id: id },
-      {
-        title: title,
-        solutionText: solutionText,
-      }
-    );
-    console.log("matched: " + results.matchedCount);
-    console.log("modified: " + results.modifiedCount);
-    res.send(results);
-  } catch (err) {
-    response.send(err.message);
+  const isPresent = await problemModel.findOne({ id: id, upVotes: userID });
+
+  if (!isPresent) {
+    // IS NOT PRESENT = ADD VOTE
+    try {
+      await problemModel.findOneAndUpdate(
+        { id: id },
+        { $addToSet: { upVotes: userID } }
+      );
+      response.send({ success: "true" });
+      return;
+    } catch (err) {
+      response.send({ success: "false" });
+    }
+  } else {
+    // IS PRESENT = REMOVE VOTE
+    try {
+      await problemModel.findOneAndUpdate(
+        { id: id, upVotes: userID },
+        { $pull: { upVotes: userID } }
+      );
+      response.send({ success: "true2" });
+    } catch (err) {
+      response.send({ success: "false2", message: err.message });
+    }
+  }
+});
+app.post("/like/solution", async (request, response) => {
+  const id = request.body.id;
+  const userID = request.body.userID;
+
+  const isPresent = await solutionModel.findOne({ id: id, upVotes: userID });
+
+  if (!isPresent) {
+    // IS NOT PRESENT = ADD VOTE
+    try {
+      await solutionModel.findOneAndUpdate(
+        { id: id },
+        { $addToSet: { upVotes: userID } }
+      );
+      response.send({ success: "true" });
+      return;
+    } catch (err) {
+      response.send({ success: "false" });
+    }
+  } else {
+    // IS PRESENT = REMOVE VOTE
+    try {
+      await solutionModel.findOneAndUpdate(
+        { id: id, upVotes: userID },
+        { $pull: { upVotes: userID } }
+      );
+      response.send({ success: "true2" });
+    } catch (err) {
+      response.send({ success: "false2", message: err.message });
+    }
   }
 });
 
 // =======================================================================================================
 // DELETES
-
 // =======================================================================================================
 // User
 app.delete("/user/:email", async (req, res) => {
