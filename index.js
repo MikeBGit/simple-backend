@@ -5,26 +5,21 @@ require("dotenv").config();
 const validator = require("validator");
 const bcrypt = require("bcrypt");
 const { v4: uuid } = require("uuid");
-
 const saltRounds = 10;
 
 const mongoose = require("mongoose");
-const userModel = require("./models/UserSchema");
-const problemModel = require("./models/ProblemSchema");
-const solutionModel = require("./models/SolutionSchema");
+const tokenModel = require("./models/TokenSchema");
+
 const { response } = require("express");
-const { findById, findOne } = require("./models/UserSchema");
+const Token = require("./models/TokenSchema");
+// const { findById, findOne } = require("./models/UserSchema");
 
 const app = express();
 const port = process.env.PORT || 3001; // Heroku determines the port dynamically
 app.use(cors());
 
 mongoose.connect(
-  "mongodb+srv://rooter:" +
-    process.env.MONGODB_PWD +
-    "@cluster0.g9mfruq.mongodb.net/" +
-    process.env.MONGODB_DB_NAME +
-    "?retryWrites=true&w=majority",
+  "mongodb+srv://root:normalPassword@music.9ywxovj.mongodb.net/music?retryWrites=true&w=majority",
   {
     useNewUrlParser: true,
     useUnifiedTopology: true,
@@ -46,129 +41,94 @@ app.use(bodyParser.json());
 
 // =======================================================================================================
 // Register
-app.post("/users/register", async (request, response) => {
-  const email = request.body.email;
-  const password = request.body.password;
-  const firstName = request.body.firstName;
-  const lastName = request.body.lastName;
-  try {
-    if (email && password && validator.isStrongPassword(password)) {
-      // Check to see if the user already exists. If not, then create it.
-      const user = await userModel.findOne({ email: email });
-      if (user) {
-        console.log(
-          "Invalid registration - email " + email + " already exists."
-        );
-        response.send({ success: false });
-        return;
-      } else {
-        hashedPassword = await bcrypt.hash(password, saltRounds);
-        console.log("Registering email " + email);
-        console.log("TEST", uuid());
-        const userToSave = {
-          id: uuid(),
-          email: email,
-          password: hashedPassword,
+// app.post("/users/register", async (request, response) => {
+//   const email = request.body.email;
+//   const password = request.body.password;
+//   const firstName = request.body.firstName;
+//   const lastName = request.body.lastName;
+//   try {
+//     if (email && password && validator.isStrongPassword(password)) {
+//       // Check to see if the user already exists. If not, then create it.
+//       const user = await userModel.findOne({ email: email });
+//       if (user) {
+//         console.log(
+//           "Invalid registration - email " + email + " already exists."
+//         );
+//         response.send({ success: false });
+//         return;
+//       } else {
+//         hashedPassword = await bcrypt.hash(password, saltRounds);
+//         console.log("Registering email " + email);
+//         console.log("TEST", uuid());
+//         const userToSave = {
+//           id: uuid(),
+//           email: email,
+//           password: hashedPassword,
 
-          firstName: firstName,
-          lastName: lastName,
-        };
-        await userModel.create(userToSave);
-        response.send({ success: true, userID: userToSave.id });
-        return;
-      }
-    }
-  } catch (error) {
-    response.send({ success: false });
-    console.log(error.message);
-  }
-});
+//           firstName: firstName,
+//           lastName: lastName,
+//         };
+//         await userModel.create(userToSave);
+//         response.send({ success: true, userID: userToSave.id });
+//         return;
+//       }
+//     }
+//   } catch (error) {
+//     response.send({ success: false });
+//     console.log(error.message);
+//   }
+// });
 
 // =======================================================================================================
-// Login
-app.post("/users/login", async (request, response) => {
-  const email = request.body.email;
-  const password = request.body.password;
-  try {
-    if (email && password) {
-      // Check to see if the user already exists. If not, then create it.
-      const user = await userModel.findOne({ email: email });
-      if (!user) {
-        const msg = "Invalid login - email " + email + " doesn't exist.";
-        console.log(msg);
-        response.send({ success: false, msg: msg });
-        return;
-      } else {
-        const isSame = await bcrypt.compare(password, user.password);
-        if (isSame) {
-          console.log("Successful login");
-          response.send({
-            success: true,
-            id: user.id,
-            firstName: user.firstName,
-            lastName: user.lastName,
-          });
-          return;
-        }
-      }
-    }
-  } catch (error) {
-    console.log(error.message);
-  }
-  response.send({ success: false });
-});
+// // Login
+// app.post("/users/login", async (request, response) => {
+//   const email = request.body.email;
+//   const password = request.body.password;
+//   try {
+//     if (email && password) {
+//       // Check to see if the user already exists. If not, then create it.
+//       const user = await userModel.findOne({ email: email });
+//       if (!user) {
+//         const msg = "Invalid login - email " + email + " doesn't exist.";
+//         console.log(msg);
+//         response.send({ success: false, msg: msg });
+//         return;
+//       } else {
+//         const isSame = await bcrypt.compare(password, user.password);
+//         if (isSame) {
+//           console.log("Successful login");
+//           response.send({
+//             success: true,
+//             id: user.id,
+//             firstName: user.firstName,
+//             lastName: user.lastName,
+//           });
+//           return;
+//         }
+//       }
+//     }
+//   } catch (error) {
+//     console.log(error.message);
+//   }
+//   response.send({ success: false });
+// });
 
 // =======================================================================================================
 // GET ALLS
 // =======================================================================================================
-app.get("/users", async (req, res) => {
-  const user = await userModel.find();
-  res.send(user);
+app.get("/token", async (req, res) => {
+  const tokens = await tokenModel.find();
+  res.send(tokens);
 });
-app.get("/problems", async (req, res) => {
-  const problem = await problemModel.find();
-  res.send(problem);
-});
-app.get("/solutions", async (req, res) => {
-  const solution = await solutionModel.find();
-  res.send(solution);
-});
+
 // =======================================================================================================
 // GET ONES
 // =======================================================================================================
-app.get("/problem/:id", async (req, res) => {
+app.get("/token/:id", async (req, res) => {
   const id = req.params.id;
   try {
-    const result = await problemModel.findOne({ id: id });
+    const result = await tokenModel.findOne({ id: id });
     res.send(result);
-  } catch (err) {
-    response.send(err.message);
-  }
-});
-app.get("/user/:id", async (req, res) => {
-  const id = req.params.id;
-  try {
-    const result = await userModel.findOne({ id: id });
-    res.send(result);
-  } catch (err) {
-    response.send(err.message);
-  }
-});
-
-app.get("/solutions/:id", async (req, res) => {
-  const id = req.params.id;
-  try {
-    const allSolutions = await solutionModel.find({ problemID: id });
-    res.send(allSolutions);
-  } catch (err) {
-    response.send(err.message);
-  }
-});
-app.get("/solution/:id", async (req, res) => {
-  const id = req.params.id;
-  try {
-    const solution = await solutionModel.findOne({ problemID: id });
-    res.send(solution);
   } catch (err) {
     response.send(err.message);
   }
@@ -177,29 +137,18 @@ app.get("/solution/:id", async (req, res) => {
 // =======================================================================================================
 // CREATES
 // =======================================================================================================
-//  User Create Problem
-app.post("/problem", async (request, response) => {
-  const authorID = request.body.authorID;
-  const authorName = request.body.authorName;
-  const problem = {
-    id: uuid(),
-    authorID: authorID,
-    title: request.body.title,
-    authorName: authorName,
-    shortDescription: request.body.shortDescription,
-    fullDescription: request.body.fullDescription,
-    errorMessages: request.body.errorMessages,
-    codeUsed: request.body.codeUsed,
-    allSolutions: [],
+
+app.post("/token", async (request, response) => {
+  const token = {
+    accessToken: request.body.accessToken,
+    expiresIn: request.body.expiresIn,
+    refreshToken: request.body.refreshToken,
+    scope: request.body.scope,
+    tokenType: request.body.tokenType,
   };
 
   try {
-    const result = await problemModel.create(problem);
-    await userModel.updateOne(
-      { id: authorID },
-      { $addToSet: { allProblemIDS: problem.id } }
-    );
-    // const result = await problemModel.create(problem);
+    const result = await tokenModel.create(token);
     response.send({ result: result, success: true });
   } catch (err) {
     response.send({ message: err.message, success: false });
@@ -207,198 +156,32 @@ app.post("/problem", async (request, response) => {
 });
 
 // =======================================================================================================
-//  Create Solution to Problem
-app.post("/solution", async (request, response) => {
-  const problemID = request.body.problemID;
-  const authorID = request.body.authorID;
-  const authorName = request.body.authorName;
-  const solution = {
-    id: uuid(),
-    problemID: problemID,
-    authorID: authorID,
-    authorName: authorName,
-    title: request.body.title,
-    solutionText: request.body.solutionText,
-  };
-  try {
-    const result = await solutionModel.create(solution);
-    const update = await problemModel.updateOne(
-      { id: problemID },
-      { $addToSet: { allSolutionIDS: solution.id } }
-    );
-    response.send({ result: result, success: "true" });
-  } catch (err) {
-    response.send({ message: err.message, success: "false" });
-  }
-});
-
-// =======================================================================================================
 // UPDATES
 // =======================================================================================================
-// Update User
-app.patch("/user/:email", async (req, res) => {
-  const paramsEmail = req.params.email;
-
-  const email = paramsEmail;
-  const firstName = req.body.firstName;
-  const lastName = req.body.lastName;
+app.patch("/token", async (req, res) => {
 
   try {
-    const results = await userModel.updateOne(
-      { email: email },
-      {
-        email: email,
-        firstName: firstName,
-        lastName: lastName,
-      }
-    );
-    console.log("matched: " + results.matchedCount);
-    console.log("modified: " + results.modifiedCount);
-    res.send({ success: "true" });
+  const results = await tokenModel.updateOne(
+    { accessToken: req.body.accessToken },
+    {
+      expiresIn: req.body.expiresIn,
+      refreshToken: req.body.refreshToken,
+      scope: req.body.scope,
+      tokenType: req.body.tokenType
+    }
+  );
+  res.send({ success: "true" });
   } catch (err) {
     response.send(err.message);
   }
 });
-// Update Problem
-
-app.patch("/problem/edit", async (req, res) => {
-  const id = req.body.id;
-
-  const title = req.body.title;
-  const shortDescription = req.body.shortDescription;
-  const fullDescription = req.body.fullDescription;
-  const errorMessages = req.body.errorMessages;
-  const codeUsed = req.body.codeUsed;
-
-  try {
-    const results = await problemModel.updateOne(
-      { id: id },
-      {
-        title: title,
-        shortDescription: shortDescription,
-        fullDescription: fullDescription,
-        errorMessages: errorMessages,
-        codeUsed: codeUsed,
-      }
-    );
-    console.log("matched: " + results.matchedCount);
-    console.log("modified: " + results.modifiedCount);
-    res.send({ success: "true" });
-  } catch (err) {
-    response.send(err.message);
-  }
-});
-// Update Solution
-app.patch("/solution/edit", async (req, res) => {
-  const id = req.body.id;
-
-  const title = req.body.title;
-  const solutionText = req.body.solutionText;
-
-  try {
-    const results = await solutionModel.updateOne(
-      { id: id },
-      {
-        title: title,
-        solutionText: solutionText,
-      }
-    );
-    console.log("matched: " + results.matchedCount);
-    console.log("modified: " + results.modifiedCount);
-    res.send({ success: "true" });
-  } catch (err) {
-    response.send(err.message);
-  }
-});
-
-// =======================================================================================================
-// LIKES
-// =======================================================================================================
-//  Create Solution to Problem
-app.post("/like/problem", async (request, response) => {
-  const id = request.body.id;
-  const userID = request.body.userID;
-
-  const isPresent = await problemModel.findOne({ id: id, upVotes: userID });
-
-  if (!isPresent) {
-    // IS NOT PRESENT = ADD VOTE
-    try {
-      await problemModel.findOneAndUpdate(
-        { id: id },
-        { $addToSet: { upVotes: userID } }
-      );
-      response.send({ success: "true" });
-      return;
-    } catch (err) {
-      response.send({ success: "false" });
-    }
-  } else {
-    // IS PRESENT = REMOVE VOTE
-    try {
-      await problemModel.findOneAndUpdate(
-        { id: id, upVotes: userID },
-        { $pull: { upVotes: userID } }
-      );
-      response.send({ success: "true2" });
-    } catch (err) {
-      response.send({ success: "false2", message: err.message });
-    }
-  }
-});
-app.post("/like/solution", async (request, response) => {
-  const id = request.body.id;
-  const userID = request.body.userID;
-
-  const isPresent = await solutionModel.findOne({ id: id, upVotes: userID });
-
-  if (!isPresent) {
-    // IS NOT PRESENT = ADD VOTE
-    try {
-      await solutionModel.findOneAndUpdate(
-        { id: id },
-        { $addToSet: { upVotes: userID } }
-      );
-      response.send({ success: "true" });
-      return;
-    } catch (err) {
-      response.send({ success: "false" });
-    }
-  } else {
-    // IS PRESENT = REMOVE VOTE
-    try {
-      await solutionModel.findOneAndUpdate(
-        { id: id, upVotes: userID },
-        { $pull: { upVotes: userID } }
-      );
-      response.send({ success: "true2" });
-    } catch (err) {
-      response.send({ success: "false2", message: err.message });
-    }
-  }
-});
-
 // =======================================================================================================
 // DELETES
 // =======================================================================================================
-// User
-app.delete("/user/:email", async (req, res) => {
-  const email = req.params.email;
-  try {
-    const results = await userModel.deleteOne({ email: email });
 
-    res.send(results);
-  } catch (err) {
-    response.send(err.message);
-  }
-});
-// =======================================================================================================
-// Problem
-app.delete("/problem/:id", async (req, res) => {
-  const id = req.params.id;
+app.delete("/token", async (req, res) => {
   try {
-    const results = await problemModel.deleteOne({ id: id });
-
+    const results = await tokenModel.deleteOne({ accessToken: req.body.accessToken });
     res.send(results);
   } catch (err) {
     response.send(err.message);
@@ -406,28 +189,12 @@ app.delete("/problem/:id", async (req, res) => {
 });
 
 // =======================================================================================================
-// Solution
-app.delete("/solution/:id", async (req, res) => {
-  const id = req.params.id;
+
+app.delete("/token/delete/all", async (req, res) => {
   try {
-    const results = await solutionModel.deleteOne({ id: id });
-
-    res.send(results);
-  } catch (err) {
-    response.send(err.message);
-  }
-});
-
-// =======================================================================================================
-//SEED
-
-app.delete("/delete/all", async (req, res) => {
-  try {
-    const usersDeleted = await userModel.deleteMany({});
-    const problemsDeleted = await problemModel.deleteMany({});
-    const solutionsDeleted = await solutionModel.deleteMany({});
-
-    res.send(usersDeleted, problemsDeleted, solutionsDeleted);
+    const tokensDeleted = await tokenModel.deleteMany({});
+  
+    res.send(tokensDeleted);
   } catch (err) {
     response.send(err.message);
   }
